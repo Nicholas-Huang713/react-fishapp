@@ -1,7 +1,5 @@
 import React from 'react';
-import logo from '../images/logo.png';
 import {withRouter, Link} from 'react-router-dom';
-import Button from '@material-ui/core/Button';
 
 function NavBar() {
     return (

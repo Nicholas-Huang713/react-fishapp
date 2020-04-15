@@ -7,6 +7,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
+import EditProfile from './components/EditProfile';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <PrivateRoute>
               {/* <Route path="/welcome" component={Welcome} /> */}
               <Route path="/dashboard" component={Dashboard} />
+              <Route path="/editprofile" component={EditProfile} />
               {/* <Route path="/album" component={Album} />
               <Route path="/favorites" component={Favorites} />
               <Route path="/admin" component={Admin} /> */}

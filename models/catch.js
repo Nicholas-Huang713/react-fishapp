@@ -1,21 +1,29 @@
 module.exports = (sequelize, DataTypes) => {
     const Catch = sequelize.define("Catch", {
-        firstname: {
+        species: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        lastname: {
+        water: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        email: {
+        tackle: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        password: { 
-            type: DataTypes.STRING,
+        latitude: {
+            type: DataTypes.BIGINT,
             allowNull: false
         },
+        longitude: {
+            type: DataTypes.BIGINT,
+            allowNull: false
+        },
+        imglocation: {
+            type: DataTypes.STRING,
+            allowNull: true
+        }
     });
     return Catch;
 }
