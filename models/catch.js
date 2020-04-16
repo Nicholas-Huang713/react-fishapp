@@ -8,21 +8,17 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        tackle: {
+        bait: {
             type: DataTypes.STRING,
             allowNull: false
         },
         latitude: {
-            type: DataTypes.BIGINT,
+            type: DataTypes.DECIMAL(20, 8),
             allowNull: false
         },
         longitude: {
-            type: DataTypes.BIGINT,
+            type: DataTypes.DECIMAL(20, 8),
             allowNull: false
-        },
-        imglocation: {
-            type: DataTypes.STRING,
-            allowNull: true
         }
     });
     return Catch;

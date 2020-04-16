@@ -11,6 +11,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import { withRouter } from "react-router-dom";
 import Map from './Map';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 
 class Dashboard extends React.Component {
   state = {
@@ -47,7 +49,7 @@ class Dashboard extends React.Component {
           justify="flex-start"
           alignItems="flex-start"
         >
-          <Grid item xs={12} sm={6} md={6} lg={4}>
+          <Grid item xs={10} sm={6} md={6} lg={4}>
             <Paper className="text-center ml-2 mt-2" elevation={3}>
               {
                 currentUser ?
@@ -57,6 +59,7 @@ class Dashboard extends React.Component {
                     <IconButton onClick={() => this.props.history.push('/editprofile')} aria-label="edit profile">
                       <EditIcon />
                     </IconButton>
+
                   </Tooltip>
                 </h3>
                 :
@@ -65,6 +68,11 @@ class Dashboard extends React.Component {
                
             </Paper>
           </Grid>
+          <Tooltip title="Post New Catch">
+            <Fab size="medium" color="secondary" aria-label="add" className="ml-2 mt-2">
+              <AddIcon onClick={() => this.props.history.push("/catch") }/>
+            </Fab>
+          </Tooltip>
         </Grid>
         <Grid container>
           <Grid item xs={12}>

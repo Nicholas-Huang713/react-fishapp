@@ -1,169 +1,65 @@
-import React, {Component} from 'react';
-import ReactMapGl, {Marker, Popup} from 'react-map-gl';
-import Pin from './Pin';
-import 'react-map-gl-geocoder/dist/mapbox-gl-geocoder.css'
-import Geocoder from 'react-map-gl-geocoder'
+import React, {useState} from 'react';
+import '../App.css';
+import ReactMapGl, {GeolocateControl, Marker} from 'react-map-gl';
+
+const geolocateStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  margin: 10
+};
 
 const fishStyle = {
-    width: "50px",
-    height: "auto"
+  width: "40px",
+  height: "auto"
 }
 
-class Map extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            viewport: {
-               width: "100vw",
-               height: "50vh",
-               latitude: 42.430472,
-               longitude: -123.334102,
-               zoom: 16
-             },
-            userLocation: {},
-            events: {},
-            selectedLocation: null
-        };
-    }
-    
-    mapRef = React.createRef();
+function Map() {
+  const [viewport, setViewport] = useState({
+    latitude: 33.985736,
+    longitude: -117.818969,
+    zoom: 10,
+    width: "100vw",
+    height: "100vh"
+  })
+  const [markers, setMarkers] = useState([])
+  const [draggable, setDraggable] = useState()
+  const [events, setEvents] = useState({})
+  const handleClick = (({lngLat: [longitude, latitude]}) => 
+    setMarkers(markers => [{longitude, latitude}])); 
+  
 
 
-    componentDidMount() {
-        this.setUserLocation();
-    }
-    setUserLocation = () => {
-        navigator.geolocation.getCurrentPosition(position => {
-            let setUserLocation = {
-                lat: position.coords.latitude,
-                long: position.coords.longitude
-                };
-            let newViewport = {
-                height: "100vh",
-                width: "100vw",
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                zoom: 15
-                };
-                this.setState({
-                viewport: newViewport,
-                userLocation: setUserLocation
-            });
-        });
-    };
+  return (
+    <div>
+      <ReactMapGl 
+        // onClick={handleClick}
+        {...viewport} mapboxApiAccessToken="pk.eyJ1Ijoibmh1YW5nNzEzIiwiYSI6ImNrOG9jOG1tZzE3bWszZm53enI2aDUza2QifQ.F2xJPRVWhz908h2nQhuTqg"
+        mapStyle="mapbox://styles/nhuang713/ck8s1ki8t08fc1iqj0yerkni8"
+          onViewportChange={viewport => {
+            setViewport(viewport);
+          }}
+        
+      >
+      <GeolocateControl
+        style={geolocateStyle}
+        positionOptions={{enableHighAccuracy: true}}
+        trackUserLocation={true}
+        showUserLocation={false}
+      />
+      
+      {markers.length
+        ? markers.map((m, i) => ( 
+            <Marker {...m} key={i}>
+              <img style={fishStyle} src="https://cdn.iconscout.com/icon/premium/png-256-thumb/fish-1524088-1289766.png" alt="fish"/>
+              {` ${m.longitude}, ${m.latitude}`}
+            </Marker>
+          ))
+        : null}
 
-    showPopUp = (e) => {
-        e.preventDefault();
-        this.setState({
-            selectedLocation: "This is my location"
-        })
-    }
-    // _updateViewport = viewport => {
-    //     this.setState({viewport});
-    // };
-    
-    _logDragEvent(name, event) {
-        this.setState({
-            events: {
-            ...this.state.events,
-            [name]: event.lngLat
-            }
-        });
-    }
-
-    _onMarkerDragStart = event => {
-        this._logDragEvent('onDragStart', event);
-    };
-
-    _onMarkerDrag = event => {
-        this._logDragEvent('onDrag', event);
-    };
-
-    _onMarkerDragEnd = event => {
-        this._logDragEvent('onDragEnd', event);
-        this.setState({
-            userLocation: {
-                long: event.lngLat[0],
-                lat: event.lngLat[1]
-            }
-        });
-    }
-
-    handleGeocoderViewportChange = (viewport) => {
-        const geocoderDefaultOverrides = { transitionDuration: 1000 }
-     
-        return this.handleViewportChange({
-          ...viewport,
-          ...geocoderDefaultOverrides
-        })
-    }
-
-    handleViewportChange = (viewport) => {
-        this.setState({
-          viewport: { ...this.state.viewport, ...viewport }
-        })
-      }
-
-    render() {
-        const {selectedLocation} = this.state;
-
-        return (
-            <div>
-                
-                <div>
-                    <ReactMapGl
-                    ref={this.mapRef}
-                    {...this.state.viewport}
-                    onViewportChange={viewport => this.setState({ viewport })}
-                    mapboxApiAccessToken="pk.eyJ1Ijoibmh1YW5nNzEzIiwiYSI6ImNrOG9jOG1tZzE3bWszZm53enI2aDUza2QifQ.F2xJPRVWhz908h2nQhuTqg"
-                    mapStyle="mapbox://styles/nhuang713/ck8s1ki8t08fc1iqj0yerkni8"
-                    
-                    >
-                        <button onClick={this.setUserLocation}>My Location</button>
-                        {Object.keys(this.state.userLocation).length !== 0 ? (
-                            <Marker
-                            latitude={this.state.userLocation.lat}
-                            longitude={this.state.userLocation.long}
-                            // offsetTop={-20}
-                            // offsetLeft={-10}
-                            draggable
-                            onDragStart={this._onMarkerDragStart}
-                            onDrag={this._onMarkerDrag}
-                            onDragEnd={this._onMarkerDragEnd}
-                            >
-                                {/* <button onClick={this.showPopUp}>
-                                    <img style={fishStyle} src="https://img.icons8.com/color/48/000000/marker.png" alt="location marker"/>
-                                </button> */}
-                                <Pin size={20} />
-                            </Marker>
-                            
-                        ) : (
-                            <div></div>
-                        )
-                    }
-                    {selectedLocation && 
-                        <Popup
-                            latitude={this.state.userLocation.lat}
-                            longitude={this.state.userLocation.long}
-                        >
-                            <div>
-                                {selectedLocation}
-                            </div>
-                        </Popup>
-                    }
-
-                        <Geocoder
-                            mapRef={this.mapRef}
-                            onViewportChange={this.handleGeocoderViewportChange}
-                            mapboxApiAccessToken="pk.eyJ1Ijoibmh1YW5nNzEzIiwiYSI6ImNrOG9jOG1tZzE3bWszZm53enI2aDUza2QifQ.F2xJPRVWhz908h2nQhuTqg"
-                            types="poi"
-                        />
-
-                    </ReactMapGl>
-                </div>
-            </div>
-        )
-    }
+      </ReactMapGl>
+    </div>
+  );
 }
 
 export default Map;

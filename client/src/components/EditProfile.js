@@ -142,8 +142,8 @@ function EditProfile() {
         message="User Updated"
         action={
           <React.Fragment>
-            <Button color="secondary" size="small" onClick={() => setOpen(false)}>
-              Close
+            <Button color="secondary" size="small" onClick={() => history.push('/dashboard')}>
+              Dashboard
             </Button>
             <IconButton size="small" aria-label="close" color="inherit" onClick={() => setOpen(false)}>
               <CloseIcon fontSize="small" />

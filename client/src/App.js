@@ -8,6 +8,8 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import EditProfile from './components/EditProfile';
+import LogCatch from './components/LogCatch';
+import CatchList from './components/CatchList';
 
 function App() {
   return (
@@ -19,12 +21,10 @@ function App() {
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <PrivateRoute>
-              {/* <Route path="/welcome" component={Welcome} /> */}
               <Route path="/dashboard" component={Dashboard} />
               <Route path="/editprofile" component={EditProfile} />
-              {/* <Route path="/album" component={Album} />
-              <Route path="/favorites" component={Favorites} />
-              <Route path="/admin" component={Admin} /> */}
+              <Route path="/catch" component={LogCatch} /> 
+              <Route path="/catchlist" component={CatchList} /> 
             </PrivateRoute>
           </Switch>
         </Router>

@@ -11,13 +11,34 @@ router.get('/all', (req, res) => {
     db.User.findAll().then(Users => res.send(Users));
 });
 
+//GET ALL CATCHES
+router.get('/allcatches', (req, res) => {
+    db.Catch.findAll({include: db.User})
+    .then((catches) => {
+        console.log(catches);
+        res.json(catches);
+    })
+    .catch(err => res.send(err));        
+})
+
+//GET ALL LOGGED IN USER CATCHES
+router.get('/usercatches', verifyToken, (req, res) => {
+    const token = jwt.verify(req.token,  process.env.TOKEN_SECRET);
+    db.Catch.findAll({where: {UserId: token._id}})
+    .then((catches) => {
+        console.log(catches);
+        res.json(catches); 
+    })
+    .catch(err => res.send(err));        
+})
+
 //GET LOGGED IN USER
 router.get('/getuser', verifyToken, (req, res) => {
-    const decodedId = jwt.verify(req.token,  process.env.TOKEN_SECRET);
-    console.log("User ID: " + JSON.stringify(decodedId));
+    const token = jwt.verify(req.token,  process.env.TOKEN_SECRET);
+    console.log("User ID: " + JSON.stringify(token));
     db.User.findOne({
         where: {
-            id: decodedId._id
+            id: token._id
         }
     })
     .then(user => {
@@ -63,17 +84,35 @@ router.post('/login', async (req, res) => {
 
 //UPDATE USER PROFILE
 router.put('/editprofile', verifyToken, (req, res) => {
-    const decodedId = jwt.verify(req.token,  process.env.TOKEN_SECRET);
+    const token = jwt.verify(req.token,  process.env.TOKEN_SECRET);
     db.User.update({
         firstname: req.body.firstName,
         lastname: req.body.lastName,
         email: req.body.email
-    }, {where: {id: decodedId._id}})
+    }, {where: {id: token._id}})
     .then(() => {
         console.log("Updated profile")
     })
     .catch((err) => res.send(err))
 });
+
+//LOG NEW CATCH
+router.post('/catch', verifyToken, (req, res) => {
+    const token = jwt.verify(req.token,  process.env.TOKEN_SECRET);
+    db.Catch.create({
+        species: req.body.species,
+        water: req.body.water,
+        bait: req.body.bait,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+        UserId: token._id
+    })
+    .then((newCatch) => {
+        console.log(JSON.stringify(newCatch));
+        res.json(newCatch);
+    })
+    .catch((err) => res.send(err));
+})
 
 function verifyToken(req, res, next){
     const bearerHeader = req.headers['authorization'];

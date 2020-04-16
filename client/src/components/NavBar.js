@@ -14,8 +14,11 @@ function NavBar() {
                 {
                     localStorage.getItem("token") ?
                     <ul className="navbar-nav mr-auto">
-                        <li className="nav-item active">
-                            <Link to="/dashboard" className="nav-link">Home <span className="sr-only">(current)</span></Link>
+                        <li className="nav-item">
+                            <Link to="/dashboard" className="nav-link">Home</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/catchlist" className="nav-link">Catches </Link>
                         </li>
                     </ul>
                     :
