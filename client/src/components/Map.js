@@ -1,6 +1,17 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import '../App.css';
-import ReactMapGl, {GeolocateControl, Marker} from 'react-map-gl';
+import ReactMapGl, {GeolocateControl, Marker, Popup} from 'react-map-gl';
+import Button from '@material-ui/core/Button';
+import trout from '../images/trout.png';
+import salmon from '../images/salmon.png';
+import tuna from '../images/tuna.png';
+import bass from '../images/bass.png';
+import lure from '../images/lure.png';
+import bread from '../images/bread.png';
+import worm from '../images/worm.png';
+import corn from '../images/corn.png';
+import {getJwt} from '../helpers/jwt';
+import axios from 'axios';
 
 const geolocateStyle = {
   position: 'absolute',
@@ -10,53 +21,123 @@ const geolocateStyle = {
 };
 
 const fishStyle = {
-  width: "40px",
+  width: "70px",
   height: "auto"
+}
+
+const baitStyle = {
+  width: "50px",
+  height: "auto"
+}
+
+const popUpStyle = {
+  padding: 30
 }
 
 function Map() {
   const [viewport, setViewport] = useState({
     latitude: 33.985736,
     longitude: -117.818969,
-    zoom: 10,
-    width: "100vw",
-    height: "100vh"
+    zoom: 12,
+    width: "100%",
+    height: "83.5vh"
   })
-  const [markers, setMarkers] = useState([])
-  const [draggable, setDraggable] = useState()
-  const [events, setEvents] = useState({})
-  const handleClick = (({lngLat: [longitude, latitude]}) => 
-    setMarkers(markers => [{longitude, latitude}])); 
-  
+  const [catchList, setCatchList] = useState([]);
+  const [currentId, setCurrentId] = useState(0);
 
+  useEffect(() => {
+    retrieveCatches();
+  },[]);
+
+  const retrieveCatches = () => {
+    const jwt = getJwt();
+    axios({ 
+        url: '/api/allcatches',
+        method: 'GET',
+        headers: {'Authorization' : `Bearer ${jwt}`}
+    })
+    .then((res) => {
+        console.log("All Catches: " + JSON.stringify(res.data));
+        setCatchList(res.data);
+    })
+    .catch((err) => {
+        console.log('Error:' + err);
+    });
+  }
 
   return (
     <div>
       <ReactMapGl 
-        // onClick={handleClick}
         {...viewport} mapboxApiAccessToken="pk.eyJ1Ijoibmh1YW5nNzEzIiwiYSI6ImNrOG9jOG1tZzE3bWszZm53enI2aDUza2QifQ.F2xJPRVWhz908h2nQhuTqg"
         mapStyle="mapbox://styles/nhuang713/ck8s1ki8t08fc1iqj0yerkni8"
           onViewportChange={viewport => {
             setViewport(viewport);
           }}
-        
       >
-      <GeolocateControl
-        style={geolocateStyle}
-        positionOptions={{enableHighAccuracy: true}}
-        trackUserLocation={true}
-        showUserLocation={false}
-      />
-      
-      {markers.length
-        ? markers.map((m, i) => ( 
-            <Marker {...m} key={i}>
-              <img style={fishStyle} src="https://cdn.iconscout.com/icon/premium/png-256-thumb/fish-1524088-1289766.png" alt="fish"/>
-              {` ${m.longitude}, ${m.latitude}`}
+        <GeolocateControl
+          style={geolocateStyle}
+          positionOptions={{enableHighAccuracy: true}}
+          trackUserLocation={true}
+          showUserLocation={false}
+        />
+        {catchList.map((fish) => {
+          return(
+            <span>
+            <Marker 
+             key={fish.id}
+             latitude={fish.latitude}
+             longitude={fish.longitude}
+            >
+              <Button onClick={() => setCurrentId(fish.id)}>             
+                {fish.species === "trout" && 
+                  <img src={trout} style={fishStyle} alt="fish marker" />
+                }
+                {fish.species === "tuna" && 
+                  <img src={tuna} style={fishStyle} alt="fish marker" />
+                }
+                {fish.species === "salmon" && 
+                  <img src={salmon} style={fishStyle} alt="fish marker" />
+                }
+                {fish.species === "bass" && 
+                  <img src={bass} style={fishStyle} alt="fish marker" />
+                }
+              </Button> 
+              
             </Marker>
-          ))
-        : null}
-
+            {
+                currentId === fish.id &&
+                <Popup
+                  latitude={fish.latitude}
+                  longitude={fish.longitude}
+                  closeOnClick={true}
+                  closeButton={true}
+                >
+                  <div style={popUpStyle}>
+                    Species: {fish.species}
+                    <br/>
+                    Angler: {fish.User.firstname}
+                    <br/>
+                    Location: {fish.water}
+                    <br/>
+                    Bait:
+                    {fish.bait === "lure" && 
+                      <img src={lure} style={baitStyle} alt="fishing bait" />
+                    }
+                    {fish.bait === "live bait" && 
+                      <img src={worm} style={baitStyle} alt="fishing bait" />
+                    }
+                    {fish.bait === "bread" && 
+                      <img src={bread} style={baitStyle} alt="fishing bait" />
+                    }
+                    {fish.bait === "corn" && 
+                      <img src={corn} style={baitStyle} alt="fishing bait" />
+                    }
+                  </div>
+                </Popup>
+              }
+              </span>
+          )
+        })}
       </ReactMapGl>
     </div>
   );

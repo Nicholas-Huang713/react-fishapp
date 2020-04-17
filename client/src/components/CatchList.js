@@ -21,7 +21,7 @@ const useStyles = makeStyles({
     maxWidth: "90%",
   },
   media: {
-    height: 140,
+    height: 150,
   },
 });
 
@@ -49,15 +49,34 @@ function CatchList() {
         });
     }
 
+    const deleteCatch = (catchId) => {
+        const jwt = getJwt();
+        axios({ 
+            url: `/api/deletecatch/${catchId}`,
+            method: 'DELETE',
+            headers: {'Authorization' : `Bearer ${jwt}`}
+        })
+        .then((res) => {
+            console.log(res.data);
+            setCatchList(res.data);
+        })
+        .catch((err) => {
+            console.log('Error:' + err);
+        });
+        retrieveCatches();
+    }   
+
     return (
         <div>
-            <Grid container>
+            <Grid container
+                justify="center"
+                alignItems="center"
+            >
                 {
                 catchList.map((fish) => {
                     return (
                         <Grid item xs={12} md={4} className="mt-2">
                             <Card className={classes.root}>
-                                <CardActionArea>
                                     {fish.species === "salmon" && 
                                         <CardMedia
                                             className={classes.media}
@@ -94,9 +113,8 @@ function CatchList() {
                                             {fish.water}
                                         </Typography>
                                     </CardContent>
-                                </CardActionArea>
                                 <CardActions>
-                                    <Button size="small" color="primary">
+                                    <Button onClick={() => deleteCatch(fish.id)} size="small" color="primary">
                                         Remove
                                     </Button>
                                     

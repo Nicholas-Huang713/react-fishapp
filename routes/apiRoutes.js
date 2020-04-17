@@ -11,6 +11,20 @@ router.get('/all', (req, res) => {
     db.User.findAll().then(Users => res.send(Users));
 });
 
+//GET SELECTED CATCH
+router.get('/catch/:fishId', (req, res) => {
+    db.Catch.findOne({
+        where: {id: req.params.fishId}
+    }, {
+        include: db.User
+    })
+    .then((fish) => {
+        console.log(fish);
+        res.json(fish);
+    })
+    .catch(err => res.send(err));        
+})
+
 //GET ALL CATCHES
 router.get('/allcatches', (req, res) => {
     db.Catch.findAll({include: db.User})
@@ -110,6 +124,23 @@ router.post('/catch', verifyToken, (req, res) => {
     .then((newCatch) => {
         console.log(JSON.stringify(newCatch));
         res.json(newCatch);
+    })
+    .catch((err) => res.send(err));
+})
+
+//DELETE CATCH
+router.delete('/deletecatch/:catchId', verifyToken, (req, res) => {
+    const token = jwt.verify(req.token,  process.env.TOKEN_SECRET);
+    db.Catch.destroy({
+        where: {id: req.params.catchId}
+    })
+    .then(() => {
+        db.Catch.findAll({include: db.User})
+        .then((catches) => {
+            console.log(catches);
+            res.json(catches);
+        })
+        .catch(err => res.send(err));  
     })
     .catch((err) => res.send(err));
 })
